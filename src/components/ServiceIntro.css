@@ -1,0 +1,28 @@
+.service-intro {
+  background: #f8f9fa;
+  padding: 3rem 1rem;
+  text-align: center;
+}
+
+.service-intro h2 {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  color: #00b894;
+}
+
+.service-intro ul {
+  list-style: none;
+  padding: 0;
+  margin: 0 auto;
+  max-width: 500px;
+}
+
+.service-intro li {
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  color: #222;
+  background: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.04);
+  padding: 1rem 0.5rem;
+}
