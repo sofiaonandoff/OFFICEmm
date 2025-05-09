@@ -9,6 +9,10 @@ const InitialInfo = () => {
     spaceSize: '',
     budget: '',
     purpose: '',
+    totalEmployees: '',
+    seatingType: '',
+    workStyle: '',
+    workStyleFlexibility: '',
     workstations: {
       count: '',
       size: '140x70', // 기본 워크스테이션 크기 (cm)
@@ -17,9 +21,16 @@ const InitialInfo = () => {
       count: 0,
       size: '2x2m'
     },
+    lockers: {
+      count: '',
+    },
     focusRooms: {
+      single: { count: 0, size: '2x2m' },
+      double: { count: 0, size: '3x2m' }
+    },
+    executiveRooms: {
       count: 0,
-      size: '2x2m'
+      size: '4x4m'
     },
     meetingRooms: {
       small: { count: 0, type: 'small' },
@@ -32,22 +43,39 @@ const InitialInfo = () => {
       lounge: { required: false, size: '' },
       breakRoom: { required: false, size: '' },
       storage: { required: false, size: '' },
-      exhibition: { required: false, size: '' }
+      exhibition: { required: false, size: '' },
+      serverRoom: { required: false, size: '' },
+      other: { required: false, size: '' }
     }
   });
 
-  const purposes = [
+  const seatingTypes = [
+    { id: 'fixed', label: '고정좌석제', description: '개인별 지정된 자리에서 업무' },
+    { id: 'flexible', label: '자율좌석제', description: '자유롭게 자리 선택 가능' }
+  ];
+
+  const workStyles = [
     { id: 'startup', label: '스타트업', icon: '🚀' },
-    { id: 'general', label: '일반 사무실', icon: '🏢' },
-    { id: 'coworking', label: '공동 작업 공간', icon: '👥' },
-    { id: 'creative', label: '크리에이티브 스튜디오', icon: '🎨' },
+    { id: 'finance', label: '재무/금융', icon: '💰' },
+    { id: 'tech', label: 'IT/기술', icon: '💻' },
+    { id: 'creative', label: '크리에이티브', icon: '🎨' },
+    { id: 'consulting', label: '컨설팅', icon: '📊' },
+    { id: 'research', label: '연구/개발', icon: '🔬' },
+    { id: 'marketing', label: '마케팅', icon: '📈' },
+    { id: 'general', label: '일반 사무', icon: '🏢' }
+  ];
+
+  const flexibilityLevels = [
+    { id: 'high', label: '매우 유연', description: '자유로운 공간 활용과 이동' },
+    { id: 'medium', label: '중간', description: '일정한 규칙 하에서 유연한 공간 활용' },
+    { id: 'low', label: '제한적', description: '정해진 공간에서 업무 수행' }
   ];
 
   const meetingRoomTypes = [
-    { id: 'small', label: '소형 회의실', capacity: '2-4명' },
-    { id: 'medium', label: '중형 회의실', capacity: '5-8명' },
-    { id: 'large', label: '대형 회의실', capacity: '9-12명' },
-    { id: 'conference', label: '컨퍼런스룸', capacity: '13명 이상' }
+    { id: 'small', label: '소형 회의실', capacity: '4명' },
+    { id: 'medium', label: '중형 회의실', capacity: '6명' },
+    { id: 'large', label: '대형 회의실', capacity: '8명' },
+    { id: 'conference', label: '컨퍼런스룸', capacity: '9명 이상' }
   ];
 
   const handleInputChange = (e) => {
@@ -144,11 +172,24 @@ const InitialInfo = () => {
     }));
   };
 
-  const handleFocusRoomCountChange = (value) => {
+  const handleFocusRoomCountChange = (type, value) => {
     setFormData(prev => ({
       ...prev,
       focusRooms: {
         ...prev.focusRooms,
+        [type]: {
+          ...prev.focusRooms[type],
+          count: parseInt(value) || 0
+        }
+      }
+    }));
+  };
+
+  const handleExecutiveRoomCountChange = (value) => {
+    setFormData(prev => ({
+      ...prev,
+      executiveRooms: {
+        ...prev.executiveRooms,
         count: parseInt(value) || 0
       }
     }));
@@ -185,6 +226,20 @@ const InitialInfo = () => {
                 </div>
               </div>
               <div className="input-field">
+                <label>오피스 총 인원</label>
+                <div className="size-input">
+                  <input
+                    type="number"
+                    name="totalEmployees"
+                    value={formData.totalEmployees}
+                    onChange={handleInputChange}
+                    placeholder="인원 수 입력"
+                    min="1"
+                  />
+                  <span className="unit">명</span>
+                </div>
+              </div>
+              <div className="input-field">
                 <label>예산 범위</label>
                 <div className="budget-options">
                   {['3000만원 미만', '3000-5000만원', '5000-9000만원', '1억원 이상'].map((option) => (
@@ -204,18 +259,55 @@ const InitialInfo = () => {
       case 2:
         return (
           <div className="step-container">
-            <h2>공간 목적 선택</h2>
-            <div className="purpose-options">
-              {purposes.map((purpose) => (
-                <button
-                  key={purpose.id}
-                  className={`purpose-option ${formData.purpose === purpose.id ? 'selected' : ''}`}
-                  onClick={() => handleInputChange({ target: { name: 'purpose', value: purpose.id } })}
-                >
-                  <span className="icon">{purpose.icon}</span>
-                  {purpose.label}
-                </button>
-              ))}
+            <h2>업무 공간 설정</h2>
+            <div className="space-settings">
+              <div className="setting-section">
+                <h3>좌석제도 선택</h3>
+                <div className="seating-options">
+                  {seatingTypes.map((type) => (
+                    <button
+                      key={type.id}
+                      className={`seating-option ${formData.seatingType === type.id ? 'selected' : ''}`}
+                      onClick={() => handleInputChange({ target: { name: 'seatingType', value: type.id } })}
+                    >
+                      <h4>{type.label}</h4>
+                      <p>{type.description}</p>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="setting-section">
+                <h3>업무 형태 선택</h3>
+                <div className="work-style-options">
+                  {workStyles.map((style) => (
+                    <button
+                      key={style.id}
+                      className={`work-style-option ${formData.workStyle === style.id ? 'selected' : ''}`}
+                      onClick={() => handleInputChange({ target: { name: 'workStyle', value: style.id } })}
+                    >
+                      <span className="icon">{style.icon}</span>
+                      {style.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="setting-section">
+                <h3>업무 공간 유연성</h3>
+                <div className="flexibility-options">
+                  {flexibilityLevels.map((level) => (
+                    <button
+                      key={level.id}
+                      className={`flexibility-option ${formData.workStyleFlexibility === level.id ? 'selected' : ''}`}
+                      onClick={() => handleInputChange({ target: { name: 'workStyleFlexibility', value: level.id } })}
+                    >
+                      <h4>{level.label}</h4>
+                      <p>{level.description}</p>
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         );
@@ -252,39 +344,74 @@ const InitialInfo = () => {
                       <option value="160x70">160 x 70</option>
                     </select>
                   </div>
+                  <div className="input-field">
+                    <label>개인 락커</label>
+                    <div className="count-input">
+                      <input
+                        type="number"
+                        name="count"
+                        value={formData.lockers.count}
+                        onChange={(e) => handleInputChange({ target: { name: 'lockers', value: { count: e.target.value } } })}
+                        min="0"
+                        placeholder="락커 개수"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div className="oa-space-info">
+                  <p>OA 공간은 워크스테이션 수와 공간 크기에 맞춰 적정한 공간을 마련합니다.</p>
+                  <p>워크스테이션 간 통로, 프린터 공간, 서류 보관 공간 등이 포함됩니다.</p>
                 </div>
                 <div className="personal-space-inputs">
                   <div className="space-count-input">
-                    <label>폰룸</label>
+                    <label>1인 포커스룸</label>
                     <div className="count-controls">
                       <button
                         className="count-button"
-                        onClick={() => handlePhoneRoomCountChange(Math.max(0, formData.phoneRooms.count - 1))}
+                        onClick={() => handleFocusRoomCountChange('single', Math.max(0, formData.focusRooms.single.count - 1))}
                       >
                         -
                       </button>
-                      <span className="count">{formData.phoneRooms.count}</span>
+                      <span className="count">{formData.focusRooms.single.count}</span>
                       <button
                         className="count-button"
-                        onClick={() => handlePhoneRoomCountChange(formData.phoneRooms.count + 1)}
+                        onClick={() => handleFocusRoomCountChange('single', formData.focusRooms.single.count + 1)}
                       >
                         +
                       </button>
                     </div>
                   </div>
                   <div className="space-count-input">
-                    <label>포커스룸</label>
+                    <label>2인 포커스룸</label>
                     <div className="count-controls">
                       <button
                         className="count-button"
-                        onClick={() => handleFocusRoomCountChange(Math.max(0, formData.focusRooms.count - 1))}
+                        onClick={() => handleFocusRoomCountChange('double', Math.max(0, formData.focusRooms.double.count - 1))}
                       >
                         -
                       </button>
-                      <span className="count">{formData.focusRooms.count}</span>
+                      <span className="count">{formData.focusRooms.double.count}</span>
                       <button
                         className="count-button"
-                        onClick={() => handleFocusRoomCountChange(formData.focusRooms.count + 1)}
+                        onClick={() => handleFocusRoomCountChange('double', formData.focusRooms.double.count + 1)}
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+                  <div className="space-count-input">
+                    <label>임원실(사무실)</label>
+                    <div className="count-controls">
+                      <button
+                        className="count-button"
+                        onClick={() => handleExecutiveRoomCountChange(Math.max(0, formData.executiveRooms.count - 1))}
+                      >
+                        -
+                      </button>
+                      <span className="count">{formData.executiveRooms.count}</span>
+                      <button
+                        className="count-button"
+                        onClick={() => handleExecutiveRoomCountChange(formData.executiveRooms.count + 1)}
                       >
                         +
                       </button>
@@ -386,12 +513,12 @@ const InitialInfo = () => {
                         checked={formData.additionalSpaces.storage.required}
                         onChange={() => handleAdditionalSpaceToggle('storage')}
                       />
-                      보관실
+                      창고
                     </label>
                     {formData.additionalSpaces.storage.required && (
                       <input
                         type="text"
-                        placeholder="보관실 크기 (예: 3x3m)"
+                        placeholder="창고 크기 (예: 3x3m)"
                         value={formData.additionalSpaces.storage.size}
                         onChange={(e) => handleAdditionalSpaceSizeChange('storage', e.target.value)}
                       />
@@ -412,6 +539,42 @@ const InitialInfo = () => {
                         placeholder="전시공간 크기 (예: 6x6m)"
                         value={formData.additionalSpaces.exhibition.size}
                         onChange={(e) => handleAdditionalSpaceSizeChange('exhibition', e.target.value)}
+                      />
+                    )}
+                  </div>
+                  <div className="space-option">
+                    <label>
+                      <input
+                        type="checkbox"
+                        checked={formData.additionalSpaces.serverRoom.required}
+                        onChange={() => handleAdditionalSpaceToggle('serverRoom')}
+                      />
+                      서버실
+                    </label>
+                    {formData.additionalSpaces.serverRoom.required && (
+                      <input
+                        type="text"
+                        placeholder="서버실 크기 (예: 4x4m)"
+                        value={formData.additionalSpaces.serverRoom.size}
+                        onChange={(e) => handleAdditionalSpaceSizeChange('serverRoom', e.target.value)}
+                      />
+                    )}
+                  </div>
+                  <div className="space-option">
+                    <label>
+                      <input
+                        type="checkbox"
+                        checked={formData.additionalSpaces.other.required}
+                        onChange={() => handleAdditionalSpaceToggle('other')}
+                      />
+                      기타
+                    </label>
+                    {formData.additionalSpaces.other.required && (
+                      <input
+                        type="text"
+                        placeholder="공간 용도와 크기 입력"
+                        value={formData.additionalSpaces.other.size}
+                        onChange={(e) => handleAdditionalSpaceSizeChange('other', e.target.value)}
                       />
                     )}
                   </div>
@@ -442,7 +605,7 @@ const InitialInfo = () => {
           onClick={handleNext}
           disabled={
             (step === 1 && (!formData.spaceSize || !formData.budget)) ||
-            (step === 2 && !formData.purpose) ||
+            (step === 2 && (!formData.seatingType || !formData.workStyle || !formData.workStyleFlexibility)) ||
             (step === 3 && (!formData.workstations.count || Object.values(formData.meetingRooms).every(room => room.count === 0)))
           }
         >

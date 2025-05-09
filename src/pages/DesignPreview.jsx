@@ -15,14 +15,36 @@ const DesignPreview = () => {
             <div className="info-item">
               <h3>기본 정보</h3>
               <p>공간 크기: {formData?.spaceSize}평</p>
+              <p>오피스 총 인원: {formData?.totalEmployees}명</p>
               <p>예산 범위: {formData?.budget}</p>
-              <p>공간 목적: {formData?.purpose}</p>
+              <p>좌석제도: {formData?.seatingType === 'fixed' ? '고정좌석제' : '자율좌석제'}</p>
+              <p>업무 형태: {
+                {
+                  'startup': '스타트업',
+                  'finance': '재무/금융',
+                  'tech': 'IT/기술',
+                  'creative': '크리에이티브',
+                  'consulting': '컨설팅',
+                  'research': '연구/개발',
+                  'marketing': '마케팅',
+                  'general': '일반 사무'
+                }[formData?.workStyle]
+              }</p>
+              <p>업무 공간 유연성: {
+                {
+                  'high': '매우 유연',
+                  'medium': '중간',
+                  'low': '제한적'
+                }[formData?.workStyleFlexibility]
+              }</p>
             </div>
             <div className="info-item">
               <h3>개인 업무공간</h3>
               <p>워크스테이션: {formData?.workstations.count}개 ({formData?.workstations.size}cm)</p>
-              <p>폰룸: {formData?.phoneRooms.count}개</p>
-              <p>포커스룸: {formData?.focusRooms.count}개</p>
+              <p>개인 락커: {formData?.lockers.count}개</p>
+              <p>1인 포커스룸: {formData?.focusRooms.single.count}개</p>
+              <p>2인 포커스룸: {formData?.focusRooms.double.count}개</p>
+              <p>임원실(사무실): {formData?.executiveRooms.count}개</p>
             </div>
             <div className="info-item">
               <h3>회의실</h3>
@@ -45,7 +67,7 @@ const DesignPreview = () => {
                     {type === 'canteen' && '캔틴'}
                     {type === 'lounge' && '라운지'}
                     {type === 'breakRoom' && '휴게실'}
-                    {type === 'storage' && '보관실'}
+                    {type === 'storage' && '창고'}
                     {type === 'exhibition' && '전시공간'}
                     {data.size && ` (${data.size})`}
                   </p>

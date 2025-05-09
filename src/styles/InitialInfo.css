@@ -385,6 +385,124 @@ select:focus {
   width: 100%;
 }
 
+.space-settings {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.setting-section {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.setting-section h3 {
+  color: #333;
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+}
+
+.seating-options,
+.flexibility-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.seating-option,
+.flexibility-option {
+  background: #f8f9fa;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: left;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.seating-option:hover,
+.flexibility-option:hover {
+  border-color: #4a90e2;
+  transform: translateY(-2px);
+}
+
+.seating-option.selected,
+.flexibility-option.selected {
+  border-color: #4a90e2;
+  background: #e8f0fe;
+}
+
+.seating-option h4,
+.flexibility-option h4 {
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.seating-option p,
+.flexibility-option p {
+  color: #666;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.work-style-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+.work-style-option {
+  background: #f8f9fa;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.work-style-option:hover {
+  border-color: #4a90e2;
+  transform: translateY(-2px);
+}
+
+.work-style-option.selected {
+  border-color: #4a90e2;
+  background: #e8f0fe;
+}
+
+.work-style-option .icon {
+  font-size: 1.5rem;
+}
+
+.oa-space-info {
+  margin: 1rem 0;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid #4a90e2;
+}
+
+.oa-space-info p {
+  color: #666;
+  margin: 0.5rem 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.oa-space-info p:first-child {
+  margin-top: 0;
+}
+
+.oa-space-info p:last-child {
+  margin-bottom: 0;
+}
+
 @media (max-width: 768px) {
   .initial-info-container {
     padding: 1rem;
@@ -428,6 +546,12 @@ select:focus {
   }
 
   .personal-space-inputs {
+    grid-template-columns: 1fr;
+  }
+
+  .seating-options,
+  .flexibility-options,
+  .work-style-options {
     grid-template-columns: 1fr;
   }
 }
