@@ -1,9 +1,30 @@
 import { useLocation } from 'react-router-dom';
+import { exportOfficeData } from '../services/officeDataService';
+import { sendOfficeDataEmail } from '../services/emailService';
 import '../styles/DesignPreview.css';
 
 const DesignPreview = () => {
   const location = useLocation();
   const formData = location.state?.formData;
+
+  const handleSubmitData = async () => {
+    try {
+      await sendOfficeDataEmail(formData);
+      alert('감사합니다. 빠른 시일 내에 담당자가 확인 후 연락드릴 예정입니다.');
+    } catch (error) {
+      console.error('데이터 제출 중 오류 발생:', error);
+      alert(error.message || '데이터 제출 중 오류가 발생했습니다. 다시 시도해주세요.');
+    }
+  };
+
+  const handleExportData = () => {
+    try {
+      exportOfficeData();
+    } catch (error) {
+      console.error('데이터 내보내기 중 오류 발생:', error);
+      alert('데이터 내보내기 중 오류가 발생했습니다.');
+    }
+  };
 
   return (
     <div className="design-preview-container">
@@ -14,6 +35,9 @@ const DesignPreview = () => {
           <div className="info-grid">
             <div className="info-item">
               <h3>기본 정보</h3>
+              <p>회사명: {formData?.companyName}</p>
+              <p>담당자: {formData?.contactName}</p>
+              <p>연락처: {formData?.contactPhone}</p>
               <p>공간 크기: {formData?.spaceSize}평</p>
               <p>오피스 총 인원: {formData?.totalEmployees}명</p>
               <p>예산 범위: {formData?.budget}</p>
@@ -69,11 +93,21 @@ const DesignPreview = () => {
                     {type === 'breakRoom' && '휴게실'}
                     {type === 'storage' && '창고'}
                     {type === 'exhibition' && '전시공간'}
+                    {type === 'serverRoom' && '서버실'}
+                    {type === 'other' && '기타'}
                     {data.size && ` (${data.size})`}
                   </p>
                 )
               ))}
             </div>
+          </div>
+          <div className="data-actions">
+            <button className="submit-button" onClick={handleSubmitData}>
+              데이터 제출하기
+            </button>
+            <button className="export-button" onClick={handleExportData}>
+              데이터 내보내기 (CSV)
+            </button>
           </div>
         </div>
         <div className="preview-section">

@@ -6,6 +6,9 @@ const InitialInfo = () => {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
+    companyName: '',
+    contactName: '',
+    contactPhone: '',
     spaceSize: '',
     budget: '',
     purpose: '',
@@ -211,6 +214,39 @@ const InitialInfo = () => {
           <div className="step-container">
             <h2>기본 정보 입력</h2>
             <div className="input-group">
+              <div className="input-field">
+                <label>회사 이름</label>
+                <input
+                  type="text"
+                  name="companyName"
+                  value={formData.companyName}
+                  onChange={handleInputChange}
+                  placeholder="회사명을 입력하세요"
+                />
+              </div>
+              <div className="contact-info">
+                <div className="input-field">
+                  <label>담당자 이름</label>
+                  <input
+                    type="text"
+                    name="contactName"
+                    value={formData.contactName}
+                    onChange={handleInputChange}
+                    placeholder="담당자 이름을 입력하세요"
+                  />
+                </div>
+                <div className="input-field">
+                  <label htmlFor="contactPhone">연락처 또는 이메일</label>
+                  <input
+                    type="tel"
+                    id="contactPhone"
+                    value={formData.contactPhone}
+                    onChange={(e) => handleInputChange({ target: { name: 'contactPhone', value: e.target.value } })}
+                    placeholder="연락처 또는 이메일을 입력해주세요"
+                    required
+                  />
+                </div>
+              </div>
               <div className="input-field">
                 <label>오피스 공간 크기</label>
                 <div className="size-input">
@@ -604,7 +640,7 @@ const InitialInfo = () => {
           className="next-button"
           onClick={handleNext}
           disabled={
-            (step === 1 && (!formData.spaceSize || !formData.budget)) ||
+            (step === 1 && (!formData.spaceSize || !formData.budget || !formData.companyName || !formData.contactName || !formData.contactPhone)) ||
             (step === 2 && (!formData.seatingType || !formData.workStyle || !formData.workStyleFlexibility)) ||
             (step === 3 && (!formData.workstations.count || Object.values(formData.meetingRooms).every(room => room.count === 0)))
           }
