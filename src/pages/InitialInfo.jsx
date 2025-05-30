@@ -9,6 +9,7 @@ const InitialInfo = () => {
     companyName: '',
     contactName: '',
     contactPhone: '',
+    contactEmail: '',
     spaceSize: '',
     budget: '',
     purpose: '',
@@ -52,6 +53,8 @@ const InitialInfo = () => {
     }
   });
 
+  const [emailError, setEmailError] = useState('');
+
   const seatingTypes = [
     { id: 'fixed', label: '고정좌석제', description: '개인별 지정된 자리에서 업무' },
     { id: 'flexible', label: '자율좌석제', description: '자유롭게 자리 선택 가능' }
@@ -81,12 +84,63 @@ const InitialInfo = () => {
     { id: 'conference', label: '컨퍼런스룸', capacity: '9명 이상' }
   ];
 
+  const budgetOptions = [
+    { id: 'basic', label: 'Basic', range: '평당 180만원-200만원', minPrice: 180, maxPrice: 200 },
+    { id: 'essential', label: 'Essential', range: '평당 200만원-250만원', minPrice: 200, maxPrice: 250 },
+    { id: 'premium', label: 'Premium', range: '평당 250만원-300만원', minPrice: 250, maxPrice: 300 },
+    { id: 'signature', label: 'Signature', range: '평당 300만원 이상', minPrice: 300, maxPrice: null }
+  ];
+
+  const formatCurrency = (amount) => {
+    if (amount >= 10000) {
+      const billions = Math.floor(amount / 10000);
+      const millions = amount % 10000;
+      if (millions === 0) {
+        return `${billions}억원`;
+      }
+      return `${billions}억 ${millions}만원`;
+    }
+    return `${amount}만원`;
+  };
+
+  const calculateEstimatedBudget = () => {
+    if (!formData.spaceSize || !formData.budget) return null;
+
+    const selectedBudget = budgetOptions.find(option => option.id === formData.budget);
+    if (!selectedBudget) return null;
+
+    const minTotal = formData.spaceSize * selectedBudget.minPrice;
+    const maxTotal = selectedBudget.maxPrice
+      ? formData.spaceSize * selectedBudget.maxPrice
+      : null;
+
+    return {
+      min: formatCurrency(minTotal),
+      max: maxTotal ? formatCurrency(maxTotal) : `${formatCurrency(minTotal)} 이상`
+    };
+  };
+
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
+
+    if (name === 'contactEmail') {
+      if (!value) {
+        setEmailError('');
+      } else if (!validateEmail(value)) {
+        setEmailError('올바른 이메일 형식이 아닙니다');
+      } else {
+        setEmailError('');
+      }
+    }
   };
 
   const handleWorkstationChange = (e) => {
@@ -236,16 +290,27 @@ const InitialInfo = () => {
                   />
                 </div>
                 <div className="input-field">
-                  <label htmlFor="contactPhone">연락처 또는 이메일</label>
+                  <label>연락처</label>
                   <input
                     type="tel"
-                    id="contactPhone"
+                    name="contactPhone"
                     value={formData.contactPhone}
-                    onChange={(e) => handleInputChange({ target: { name: 'contactPhone', value: e.target.value } })}
-                    placeholder="연락처 또는 이메일을 입력해주세요"
-                    required
+                    onChange={handleInputChange}
+                    placeholder="연락처를 입력하세요"
                   />
                 </div>
+              </div>
+              <div className="input-field">
+                <label>이메일</label>
+                <input
+                  type="email"
+                  name="contactEmail"
+                  value={formData.contactEmail}
+                  onChange={handleInputChange}
+                  placeholder="이메일을 입력하세요"
+                  required
+                />
+                {emailError && <span className="error-message">{emailError}</span>}
               </div>
               <div className="input-field">
                 <label>오피스 공간 크기</label>
@@ -278,16 +343,26 @@ const InitialInfo = () => {
               <div className="input-field">
                 <label>예산 범위</label>
                 <div className="budget-options">
-                  {['3000만원 미만', '3000-5000만원', '5000-9000만원', '1억원 이상'].map((option) => (
+                  {budgetOptions.map((option) => (
                     <button
-                      key={option}
-                      className={`budget-option ${formData.budget === option ? 'selected' : ''}`}
-                      onClick={() => handleInputChange({ target: { name: 'budget', value: option } })}
+                      key={option.id}
+                      className={`budget-option ${formData.budget === option.id ? 'selected' : ''}`}
+                      onClick={() => handleInputChange({ target: { name: 'budget', value: option.id } })}
                     >
-                      {option}
+                      <h4>{option.label}</h4>
+                      <p>{option.range}</p>
                     </button>
                   ))}
                 </div>
+                {formData.spaceSize && formData.budget && (
+                  <div className="estimated-budget">
+                    <p>예상 총 예산: {
+                      formData.budget === 'signature'
+                        ? calculateEstimatedBudget().max
+                        : `${calculateEstimatedBudget().min} ~ ${calculateEstimatedBudget().max}`
+                    }</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -640,7 +715,9 @@ const InitialInfo = () => {
           className="next-button"
           onClick={handleNext}
           disabled={
-            (step === 1 && (!formData.spaceSize || !formData.budget || !formData.companyName || !formData.contactName || !formData.contactPhone)) ||
+            (step === 1 && (!formData.spaceSize || !formData.budget || !formData.companyName ||
+              !formData.contactName || !formData.contactPhone || !formData.contactEmail ||
+              emailError || !validateEmail(formData.contactEmail))) ||
             (step === 2 && (!formData.seatingType || !formData.workStyle || !formData.workStyleFlexibility)) ||
             (step === 3 && (!formData.workstations.count || Object.values(formData.meetingRooms).every(room => room.count === 0)))
           }
