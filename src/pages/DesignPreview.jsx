@@ -26,6 +26,22 @@ const DesignPreview = () => {
     }
   };
 
+  const handleExportCSV = () => {
+    const csvContent = generateCSV(formData);
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+
+    link.setAttribute('href', url);
+    link.setAttribute('download', `${formData.companyName}_오피스_설계_데이터_${new Date().toLocaleDateString()}.csv`);
+    link.style.visibility = 'hidden';
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="design-preview-container">
       <h2>오피스 설계 미리보기</h2>
