@@ -17,30 +17,86 @@ const DesignPreview = () => {
     }
   };
 
-  const handleExportData = () => {
-    try {
-      exportOfficeData();
-    } catch (error) {
-      console.error('데이터 내보내기 중 오류 발생:', error);
-      alert('데이터 내보내기 중 오류가 발생했습니다.');
-    }
+  const generateCSV = (data) => {
+    const rows = [
+      ['구분', '항목', '내용'],
+      ['기본 정보', '회사명', data.companyName],
+      ['', '담당자', data.contactName],
+      ['', '연락처', data.contactPhone],
+      ['', '이메일', data.contactEmail],
+      ['', '공간 크기', `${data.spaceSize}평`],
+      ['', '총 인원', `${data.totalEmployees}명`],
+      ['', '예산 범위', data.budget],
+      ['', '좌석제도', data.seatingType === 'fixed' ? '고정좌석제' : '자율좌석제'],
+      ['', '업무 형태', {
+        'startup': '스타트업',
+        'finance': '재무/금융',
+        'tech': 'IT/기술',
+        'creative': '크리에이티브',
+        'consulting': '컨설팅',
+        'research': '연구/개발',
+        'marketing': '마케팅',
+        'general': '일반 사무'
+      }[data.workStyle]],
+      ['', '업무 공간 유연성', {
+        'high': '매우 유연',
+        'medium': '중간',
+        'low': '제한적'
+      }[data.workStyleFlexibility]],
+      ['개인 업무공간', '워크스테이션', `${data.workstations.count}개 (${data.workstations.size}cm)`],
+      ['', '개인 락커', `${data.lockers.count}개`],
+      ['', '1인 포커스룸', `${data.focusRooms.single.count}개`],
+      ['', '2인 포커스룸', `${data.focusRooms.double.count}개`],
+      ['', '임원실(사무실)', `${data.executiveRooms.count}개`],
+      ['회의실', '소형 회의실(4인)', `${data.meetingRooms.small.count}개`],
+      ['', '중형 회의실(6인)', `${data.meetingRooms.medium.count}개`],
+      ['', '대형 회의실(8인)', `${data.meetingRooms.large.count}개`],
+      ['', '컨퍼런스룸(9인 이상)', `${data.meetingRooms.conference.count}개`]
+    ];
+
+    // 추가 공간 정보 추가
+    Object.entries(data.additionalSpaces).forEach(([type, space]) => {
+      if (space.required) {
+        const spaceName = {
+          'canteen': '캔틴',
+          'lounge': '라운지',
+          'breakRoom': '휴게실',
+          'storage': '창고',
+          'exhibition': '전시공간',
+          'serverRoom': '서버실',
+          'other': '기타'
+        }[type];
+        rows.push(['추가 공간', spaceName, space.size || '']);
+      }
+    });
+
+    // CSV 문자열 생성
+    return rows.map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
   };
 
   const handleExportCSV = () => {
-    const csvContent = generateCSV(formData);
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
+    try {
+      const csvContent = generateCSV(formData);
+      const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
 
-    link.setAttribute('href', url);
-    link.setAttribute('download', `${formData.companyName}_오피스_설계_데이터_${new Date().toLocaleDateString()}.csv`);
-    link.style.visibility = 'hidden';
+      link.setAttribute('href', url);
+      link.setAttribute('download', `${formData.companyName}_오피스_설계_데이터_${new Date().toLocaleDateString()}.csv`);
+      link.style.visibility = 'hidden';
 
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('CSV 파일 생성 중 오류 발생:', error);
+      alert('CSV 파일 생성 중 오류가 발생했습니다.');
+    }
   };
+
+  // handleExportData 함수를 handleExportCSV로 대체
+  const handleExportData = handleExportCSV;
 
   return (
     <div className="design-preview-container">
