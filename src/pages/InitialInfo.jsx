@@ -1,32 +1,33 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import '../styles/InitialInfo.css';
 
 const InitialInfo = () => {
+  const location = useLocation();
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState({
+  const [emailError, setEmailError] = useState('');
+
+  // 초기 formData 상태
+  const initialFormData = {
     companyName: '',
     contactName: '',
     contactPhone: '',
     contactEmail: '',
     spaceSize: '',
-    budget: '',
-    purpose: '',
     totalEmployees: '',
+    budget: '',
+    startSchedule: '',
+    endSchedule: '',
     seatingType: '',
     workStyle: '',
     workStyleFlexibility: '',
     workstations: {
-      count: '',
-      size: '140x70', // 기본 워크스테이션 크기 (cm)
-    },
-    phoneRooms: {
       count: 0,
-      size: '2x2m'
+      size: '140x70'
     },
     lockers: {
-      count: '',
+      count: 0
     },
     focusRooms: {
       single: { count: 0, size: '2x2m' },
@@ -51,9 +52,122 @@ const InitialInfo = () => {
       serverRoom: { required: false, size: '' },
       other: { required: false, size: '' }
     }
-  });
+  };
 
-  const [emailError, setEmailError] = useState('');
+  const [formData, setFormData] = useState(initialFormData);
+
+  useEffect(() => {
+    console.log('Location state:', location.state); // 디버깅용 로그
+
+    if (location.state?.formData) {
+      const prevData = location.state.formData;
+      console.log('Previous data:', prevData); // 디버깅용 로그
+
+      // 미리보기 페이지에서 돌아왔을 때의 처리
+      if (location.state.fromPreview) {
+        // 깊은 복사를 통한 데이터 설정
+        const newData = JSON.parse(JSON.stringify(prevData));
+        console.log('New data:', newData); // 디버깅용 로그
+        setFormData(newData);
+
+        // 마지막으로 입력한 단계로 이동
+        if (newData.workstations?.count > 0) {
+          setStep(3);
+        } else if (newData.seatingType) {
+          setStep(2);
+        } else {
+          setStep(1);
+        }
+      } else {
+        // 일반적인 데이터 병합
+        const mergedData = {
+          ...initialFormData,
+          ...prevData,
+          workstations: {
+            ...initialFormData.workstations,
+            ...prevData.workstations
+          },
+          lockers: {
+            ...initialFormData.lockers,
+            ...prevData.lockers
+          },
+          focusRooms: {
+            single: {
+              ...initialFormData.focusRooms.single,
+              ...prevData.focusRooms?.single
+            },
+            double: {
+              ...initialFormData.focusRooms.double,
+              ...prevData.focusRooms?.double
+            }
+          },
+          executiveRooms: {
+            ...initialFormData.executiveRooms,
+            ...prevData.executiveRooms
+          },
+          meetingRooms: {
+            small: {
+              ...initialFormData.meetingRooms.small,
+              ...prevData.meetingRooms?.small
+            },
+            medium: {
+              ...initialFormData.meetingRooms.medium,
+              ...prevData.meetingRooms?.medium
+            },
+            large: {
+              ...initialFormData.meetingRooms.large,
+              ...prevData.meetingRooms?.large
+            },
+            conference: {
+              ...initialFormData.meetingRooms.conference,
+              ...prevData.meetingRooms?.conference
+            }
+          },
+          additionalSpaces: {
+            canteen: {
+              ...initialFormData.additionalSpaces.canteen,
+              ...prevData.additionalSpaces?.canteen
+            },
+            lounge: {
+              ...initialFormData.additionalSpaces.lounge,
+              ...prevData.additionalSpaces?.lounge
+            },
+            breakRoom: {
+              ...initialFormData.additionalSpaces.breakRoom,
+              ...prevData.additionalSpaces?.breakRoom
+            },
+            storage: {
+              ...initialFormData.additionalSpaces.storage,
+              ...prevData.additionalSpaces?.storage
+            },
+            exhibition: {
+              ...initialFormData.additionalSpaces.exhibition,
+              ...prevData.additionalSpaces?.exhibition
+            },
+            serverRoom: {
+              ...initialFormData.additionalSpaces.serverRoom,
+              ...prevData.additionalSpaces?.serverRoom
+            },
+            other: {
+              ...initialFormData.additionalSpaces.other,
+              ...prevData.additionalSpaces?.other
+            }
+          }
+        };
+        console.log('Merged data:', mergedData); // 디버깅용 로그
+        setFormData(mergedData);
+
+        // 마지막으로 입력한 단계로 이동
+        if (prevData.workstations?.count > 0) {
+          setStep(3);
+        } else if (prevData.seatingType) {
+          setStep(2);
+        } else {
+          setStep(1);
+        }
+      }
+    }
+  }, [location.state]);
 
   const seatingTypes = [
     { id: 'fixed', label: '고정좌석제', description: '개인별 지정된 자리에서 업무' },
@@ -261,6 +375,16 @@ const InitialInfo = () => {
     }
   };
 
+  const handleSkip = () => {
+    if (step === 2 || step === 3) {
+      if (step === 2) {
+        setStep(3);
+      } else {
+        navigate('/design-preview', { state: { formData } });
+      }
+    }
+  };
+
   const renderStep = () => {
     switch (step) {
       case 1:
@@ -269,7 +393,7 @@ const InitialInfo = () => {
             <h2>기본 정보 입력</h2>
             <div className="input-group">
               <div className="input-field">
-                <label>회사 이름</label>
+                <label>회사 이름 <span className="required">*</span></label>
                 <input
                   type="text"
                   name="companyName"
@@ -280,7 +404,7 @@ const InitialInfo = () => {
               </div>
               <div className="contact-info">
                 <div className="input-field">
-                  <label>담당자 이름</label>
+                  <label>담당자 이름 <span className="required">*</span></label>
                   <input
                     type="text"
                     name="contactName"
@@ -290,7 +414,7 @@ const InitialInfo = () => {
                   />
                 </div>
                 <div className="input-field">
-                  <label>연락처</label>
+                  <label>연락처 <span className="required">*</span></label>
                   <input
                     type="tel"
                     name="contactPhone"
@@ -301,14 +425,13 @@ const InitialInfo = () => {
                 </div>
               </div>
               <div className="input-field">
-                <label>이메일</label>
+                <label>이메일 <span className="required">*</span></label>
                 <input
                   type="email"
                   name="contactEmail"
                   value={formData.contactEmail}
                   onChange={handleInputChange}
                   placeholder="이메일을 입력하세요"
-                  required
                 />
                 {emailError && <span className="error-message">{emailError}</span>}
               </div>
@@ -364,6 +487,34 @@ const InitialInfo = () => {
                   </div>
                 )}
               </div>
+              <div className="schedule-inputs">
+                <div className="input-field">
+                  <label>시작 일정</label>
+                  <div className="schedule-input">
+                    <input
+                      type="month"
+                      name="startSchedule"
+                      value={formData.startSchedule}
+                      onChange={handleInputChange}
+                      min={new Date().toISOString().slice(0, 7)}
+                      placeholder="시작 일정을 선택하세요"
+                    />
+                  </div>
+                </div>
+                <div className="input-field">
+                  <label>공사 완료 일정</label>
+                  <div className="schedule-input">
+                    <input
+                      type="month"
+                      name="endSchedule"
+                      value={formData.endSchedule}
+                      onChange={handleInputChange}
+                      min={formData.startSchedule || new Date().toISOString().slice(0, 7)}
+                      placeholder="완료 일정을 선택하세요"
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         );
@@ -372,22 +523,6 @@ const InitialInfo = () => {
           <div className="step-container">
             <h2>업무 공간 설정</h2>
             <div className="space-settings">
-              <div className="setting-section">
-                <h3>좌석제도 선택</h3>
-                <div className="seating-options">
-                  {seatingTypes.map((type) => (
-                    <button
-                      key={type.id}
-                      className={`seating-option ${formData.seatingType === type.id ? 'selected' : ''}`}
-                      onClick={() => handleInputChange({ target: { name: 'seatingType', value: type.id } })}
-                    >
-                      <h4>{type.label}</h4>
-                      <p>{type.description}</p>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
               <div className="setting-section">
                 <h3>업무 형태 선택</h3>
                 <div className="work-style-options">
@@ -399,6 +534,22 @@ const InitialInfo = () => {
                     >
                       <span className="icon">{style.icon}</span>
                       {style.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="setting-section">
+                <h3>좌석제도 선택</h3>
+                <div className="seating-options">
+                  {seatingTypes.map((type) => (
+                    <button
+                      key={type.id}
+                      className={`seating-option ${formData.seatingType === type.id ? 'selected' : ''}`}
+                      onClick={() => handleInputChange({ target: { name: 'seatingType', value: type.id } })}
+                    >
+                      <h4>{type.label}</h4>
+                      <p>{type.description}</p>
                     </button>
                   ))}
                 </div>
@@ -711,15 +862,19 @@ const InitialInfo = () => {
             이전
           </button>
         )}
+        {(step === 2 || step === 3) && (
+          <button className="skip-button" onClick={handleSkip}>
+            SKIP
+          </button>
+        )}
         <button
           className="next-button"
           onClick={handleNext}
           disabled={
-            (step === 1 && (!formData.spaceSize || !formData.budget || !formData.companyName ||
-              !formData.contactName || !formData.contactPhone || !formData.contactEmail ||
+            (step === 1 && (!formData.companyName || !formData.contactName ||
+              !formData.contactPhone || !formData.contactEmail ||
               emailError || !validateEmail(formData.contactEmail))) ||
-            (step === 2 && (!formData.seatingType || !formData.workStyle || !formData.workStyleFlexibility)) ||
-            (step === 3 && (!formData.workstations.count || Object.values(formData.meetingRooms).every(room => room.count === 0)))
+            (step === 2 && (!formData.seatingType || !formData.workStyle || !formData.workStyleFlexibility))
           }
         >
           {step === 3 ? '설계 시작하기' : '다음'}

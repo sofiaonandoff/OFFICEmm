@@ -1,20 +1,123 @@
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { exportOfficeData } from '../services/officeDataService';
 import { sendOfficeDataEmail } from '../services/emailService';
 import '../styles/DesignPreview.css';
 
 const DesignPreview = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const formData = location.state?.formData;
 
   const handleSubmitData = async () => {
     try {
-      await sendOfficeDataEmail(formData);
+      // 이메일 템플릿에 맞는 데이터 구성
+      const emailData = {
+        company_name: formData?.companyName || '',
+        contact_name: formData?.contactName || '',
+        contact_phone: formData?.contactPhone || '',
+        from_email: formData?.contactEmail || '',
+        space_size: formData?.spaceSize ? `${formData.spaceSize}평` : '',
+        total_employees: formData?.totalEmployees ? `${formData.totalEmployees}명` : '',
+        budget: formData?.budget || '',
+        start_schedule: formData?.startSchedule ? new Date(formData.startSchedule).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long' }) : '미정',
+        end_schedule: formData?.endSchedule ? new Date(formData.endSchedule).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long' }) : '미정',
+        work_style: {
+          'startup': '스타트업',
+          'finance': '재무/금융',
+          'tech': 'IT/기술',
+          'creative': '크리에이티브',
+          'consulting': '컨설팅',
+          'research': '연구/개발',
+          'marketing': '마케팅',
+          'general': '일반 사무'
+        }[formData?.workStyle] || '',
+        seating_type: formData?.seatingType === 'fixed' ? '고정좌석제' : '자율좌석제',
+        work_style_flexibility: {
+          'high': '매우 유연',
+          'medium': '중간',
+          'low': '제한적'
+        }[formData?.workStyleFlexibility] || '',
+        workstations: formData?.workstations ? `${formData.workstations.count || 0}개 (${formData.workstations.size || ''}cm)` : '0개',
+        lockers: formData?.lockers ? `${formData.lockers.count || 0}개` : '0개',
+        focus_rooms_single: formData?.focusRooms?.single ? `${formData.focusRooms.single.count || 0}개` : '0개',
+        focus_rooms_double: formData?.focusRooms?.double ? `${formData.focusRooms.double.count || 0}개` : '0개',
+        executive_rooms: formData?.executiveRooms ? `${formData.executiveRooms.count || 0}개` : '0개',
+        meeting_rooms_small: formData?.meetingRooms?.small ? `${formData.meetingRooms.small.count || 0}개` : '0개',
+        meeting_rooms_medium: formData?.meetingRooms?.medium ? `${formData.meetingRooms.medium.count || 0}개` : '0개',
+        meeting_rooms_large: formData?.meetingRooms?.large ? `${formData.meetingRooms.large.count || 0}개` : '0개',
+        meeting_rooms_conference: formData?.meetingRooms?.conference ? `${formData.meetingRooms.conference.count || 0}개` : '0개',
+        additional_spaces: Object.entries(formData?.additionalSpaces || {})
+          .filter(([_, space]) => space?.required)
+          .map(([type, space]) => {
+            const spaceName = {
+              'canteen': '캔틴',
+              'lounge': '라운지',
+              'breakRoom': '휴게실',
+              'storage': '창고',
+              'exhibition': '전시공간',
+              'serverRoom': '서버실',
+              'other': '기타'
+            }[type] || type;
+            return `- ${spaceName}${space?.size ? ` (${space.size})` : ''}`;
+          })
+          .join('\n')
+      };
+
+      await sendOfficeDataEmail(emailData);
       alert('감사합니다. 빠른 시일 내에 담당자가 확인 후 연락드릴 예정입니다.');
     } catch (error) {
       console.error('데이터 제출 중 오류 발생:', error);
       alert(error.message || '데이터 제출 중 오류가 발생했습니다. 다시 시도해주세요.');
     }
+  };
+
+  const handleGoBack = () => {
+    // formData가 있는지 확인하고, 없으면 기본값 설정
+    const dataToPass = formData || {
+      companyName: '',
+      contactName: '',
+      contactPhone: '',
+      contactEmail: '',
+      spaceSize: '',
+      totalEmployees: '',
+      budget: '',
+      startSchedule: '',
+      endSchedule: '',
+      seatingType: '',
+      workStyle: '',
+      workStyleFlexibility: '',
+      workstations: { count: 0, size: '140x70' },
+      lockers: { count: 0 },
+      focusRooms: { single: { count: 0 }, double: { count: 0 } },
+      executiveRooms: { count: 0 },
+      meetingRooms: {
+        small: { count: 0 },
+        medium: { count: 0 },
+        large: { count: 0 },
+        conference: { count: 0 }
+      },
+      additionalSpaces: {
+        canteen: { required: false, size: '' },
+        lounge: { required: false, size: '' },
+        breakRoom: { required: false, size: '' },
+        storage: { required: false, size: '' },
+        exhibition: { required: false, size: '' },
+        serverRoom: { required: false, size: '' },
+        other: { required: false, size: '' }
+      }
+    };
+
+    // 데이터를 문자열로 변환했다가 다시 파싱하여 깊은 복사 수행
+    const deepCopiedData = JSON.parse(JSON.stringify(dataToPass));
+
+    // replace: true를 사용하여 브라우저 히스토리에 새 항목을 추가하지 않음
+    navigate('/initial-info', {
+      state: {
+        formData: deepCopiedData,
+        fromPreview: true
+      },
+      replace: true
+    });
   };
 
   const generateCSV = (data) => {
@@ -24,11 +127,12 @@ const DesignPreview = () => {
       ['', '담당자', data.contactName],
       ['', '연락처', data.contactPhone],
       ['', '이메일', data.contactEmail],
-      ['', '공간 크기', `${data.spaceSize}평`],
+      ['규모 및 예산 범위', '공간 크기', `${data.spaceSize}평`],
       ['', '총 인원', `${data.totalEmployees}명`],
       ['', '예산 범위', data.budget],
-      ['', '좌석제도', data.seatingType === 'fixed' ? '고정좌석제' : '자율좌석제'],
-      ['', '업무 형태', {
+      ['', '시작 일정', data.startSchedule ? new Date(data.startSchedule).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long' }) : '미정'],
+      ['', '완료 일정', data.endSchedule ? new Date(data.endSchedule).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long' }) : '미정'],
+      ['업무 공간 설정', '업무 형태', {
         'startup': '스타트업',
         'finance': '재무/금융',
         'tech': 'IT/기술',
@@ -38,6 +142,7 @@ const DesignPreview = () => {
         'marketing': '마케팅',
         'general': '일반 사무'
       }[data.workStyle]],
+      ['', '좌석제도', data.seatingType === 'fixed' ? '고정좌석제' : '자율좌석제'],
       ['', '업무 공간 유연성', {
         'high': '매우 유연',
         'medium': '중간',
@@ -110,10 +215,18 @@ const DesignPreview = () => {
               <p>회사명: {formData?.companyName}</p>
               <p>담당자: {formData?.contactName}</p>
               <p>연락처: {formData?.contactPhone}</p>
+              <p>이메일: {formData?.contactEmail}</p>
+            </div>
+            <div className="info-item">
+              <h3>규모 및 예산 범위</h3>
               <p>공간 크기: {formData?.spaceSize}평</p>
               <p>오피스 총 인원: {formData?.totalEmployees}명</p>
               <p>예산 범위: {formData?.budget}</p>
-              <p>좌석제도: {formData?.seatingType === 'fixed' ? '고정좌석제' : '자율좌석제'}</p>
+              <p>시작 일정: {formData?.startSchedule ? new Date(formData.startSchedule).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long' }) : '미정'}</p>
+              <p>완료 일정: {formData?.endSchedule ? new Date(formData.endSchedule).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long' }) : '미정'}</p>
+            </div>
+            <div className="info-item">
+              <h3>업무 공간 설정</h3>
               <p>업무 형태: {
                 {
                   'startup': '스타트업',
@@ -126,6 +239,7 @@ const DesignPreview = () => {
                   'general': '일반 사무'
                 }[formData?.workStyle]
               }</p>
+              <p>좌석제도: {formData?.seatingType === 'fixed' ? '고정좌석제' : '자율좌석제'}</p>
               <p>업무 공간 유연성: {
                 {
                   'high': '매우 유연',
@@ -174,6 +288,9 @@ const DesignPreview = () => {
             </div>
           </div>
           <div className="data-actions">
+            <button className="back-button" onClick={handleGoBack}>
+              이전으로 돌아가기
+            </button>
             <button className="submit-button" onClick={handleSubmitData}>
               데이터 제출하기
             </button>

@@ -560,6 +560,69 @@ select:focus {
   display: block;
 }
 
+.schedule-inputs {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.schedule-inputs .input-field {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.schedule-input {
+  position: relative;
+  width: 100%;
+}
+
+.schedule-input input[type="month"] {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: border-color 0.2s ease;
+  background-color: white;
+  cursor: pointer;
+  height: 48px;
+  box-sizing: border-box;
+}
+
+.schedule-input input[type="month"]:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+.schedule-input input[type="month"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  padding: 0.5rem;
+}
+
+.required {
+  color: #dc3545;
+  margin-left: 0.25rem;
+}
+
+.skip-button {
+  padding: 0.75rem 1.5rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background-color: transparent;
+  color: #666;
+  margin-right: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.skip-button:hover {
+  background-color: #f5f5f5;
+  border-color: #ccc;
+}
+
 @media (max-width: 768px) {
   .initial-info-container {
     padding: 1rem;
@@ -619,6 +682,11 @@ select:focus {
 
   .contact-info .input-field {
     margin-bottom: 1rem;
+  }
+
+  .schedule-inputs {
+    flex-direction: column;
+    gap: 1rem;
   }
 }
 
@@ -809,6 +877,30 @@ select:focus {
   }
 
   .error-message {
+    color: #ff6b6b;
+  }
+
+  .schedule-input input[type="month"] {
+    background-color: #2d2d2d;
+    border-color: #404040;
+    color: #ffffff;
+  }
+
+  .schedule-input input[type="month"]:focus {
+    border-color: #4dabf7;
+  }
+
+  .skip-button {
+    border-color: #404040;
+    color: #b0b0b0;
+  }
+
+  .skip-button:hover {
+    background-color: #2d2d2d;
+    border-color: #4d4d4d;
+  }
+
+  .required {
     color: #ff6b6b;
   }
 }

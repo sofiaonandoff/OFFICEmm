@@ -1,4 +1,4 @@
-import { HashRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import InitialInfo from './pages/InitialInfo';
 import DesignPreview from './pages/DesignPreview';
 import './App.css';
@@ -18,6 +18,7 @@ function App() {
         <main>
           <Routes>
             <Route path="/" element={<InitialInfo />} />
+            <Route path="/initial-info" element={<InitialInfo />} />
             <Route path="/design-preview" element={<DesignPreview />} />
           </Routes>
         </main>
