@@ -1,8 +1,9 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import InitialInfo from './pages/InitialInfo';
-import WorkspaceInfo from './pages/WorkspaceInfo';
+/*import WorkspaceInfo from './pages/WorkspaceInfo';
 import MeetingRoomInfo from './pages/MeetingRoomInfo';
 import AdditionalSpaceInfo from './pages/AdditionalSpaceInfo';
+*/
 import DesignPreview from './pages/DesignPreview';
 import './App.css';
 
@@ -28,12 +29,14 @@ function App() {
       </div>
     </Router>
   );
-  /*
+}
+/*
+function App() {
   return (
     <Router>
       <div className="App">
         <Routes>
-          <Route path="/" element={<DesignPreview />} />
+          <Route path="/" element={<Navigate to="/initial-info" replace />} />
           <Route path="/initial-info" element={<InitialInfo />} />
           <Route path="/workspace-info" element={<WorkspaceInfo />} />
           <Route path="/meetingroom-info" element={<MeetingRoomInfo />} />
@@ -43,7 +46,6 @@ function App() {
       </div>
     </Router>
   );
-  */
 }
-
+*/
 export default App;
