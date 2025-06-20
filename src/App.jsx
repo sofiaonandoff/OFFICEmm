@@ -9,8 +9,8 @@ import './App.css';
 
 function App() {
   return (
-    <Router>
-      <div className="app">
+    <Router basename="/officemm">
+      <div className="App">
         <header className="app-header">
           <div className="header-content">
             <div className="logo">OFFICEmm</div>
@@ -21,7 +21,7 @@ function App() {
         </header>
         <main>
           <Routes>
-            <Route path="/" element={<InitialInfo />} />
+            <Route path="/" element={<Navigate to="/initial-info" replace />} />
             <Route path="/initial-info" element={<InitialInfo />} />
             <Route path="/design-preview" element={<DesignPreview />} />
           </Routes>
@@ -36,6 +36,8 @@ function App() {
     <Router>
       <div className="App">
         <Routes>
+                    <Route path="/" element={<InitialInfo />} />
+
           <Route path="/" element={<Navigate to="/initial-info" replace />} />
           <Route path="/initial-info" element={<InitialInfo />} />
           <Route path="/workspace-info" element={<WorkspaceInfo />} />
