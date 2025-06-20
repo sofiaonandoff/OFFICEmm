@@ -15,8 +15,8 @@ const generateCSV = (data) => {
     ['규모 및 예산 범위', '공간 크기', data?.space_size || ''],
     ['', '총 인원', data?.total_employees || ''],
     ['', '예산 범위', data?.budget || ''],
-    ['', '시작 일정', data?.start_schedule || '미정'],
-    ['', '완료 일정', data?.end_schedule || '미정'],
+    ['', '시작 일정', data?.start_schedule ? data.start_schedule : '미정'],
+    ['', '완료 일정', data?.end_schedule ? data.end_schedule : '미정'],
     ['업무 공간 설정', '업무 형태', Array.isArray(data?.work_style) ? data.work_style.map(id => getWorkStyleLabel(id, data)).join(', ') : (data?.work_style || '')],
     ['', '좌석제도', data?.seating_type || ''],
     ['', '업무 공간 유연성', data?.work_style_flexibility || ''],
@@ -61,8 +61,8 @@ export const sendOfficeDataEmail = async (formData) => {
       office_size: formData?.space_size || '',
       employee_count: formData?.total_employees || '',
       office_budget: formData?.budget || '',
-      start_schedule: formData?.start_schedule || '미정',
-      end_schedule: formData?.end_schedule || '미정',
+      start_schedule: formData?.start_schedule ? formData.start_schedule : '미정',
+      end_schedule: formData?.end_schedule ? formData.end_schedule : '미정',
       seating_type: formData?.seating_type || '',
       work_style: Array.isArray(formData?.work_style) ? formData.work_style.map(id => getWorkStyleLabel(id, formData)).join(', ') : (formData?.work_style || ''),
       work_style_flexibility: formData?.work_style_flexibility || '',
@@ -145,6 +145,8 @@ const formatEmailContent = (data) => {
 좌석제도: ${data.seatingType === 'fixed' ? '고정좌석제' : '자율좌석제'}
 업무 형태: ${Array.isArray(data.workStyle) ? data.workStyle.map(id => workStyleMap[id]).filter(Boolean).join(', ') : workStyleMap[data.workStyle]}
 업무 공간 유연성: ${flexibilityMap[data.workStyleFlexibility]}
+시작 일정: ${data.startSchedule || data.start_schedule || '미정'}
+완료 일정: ${data.endSchedule || data.end_schedule || '미정'}
 
 [개인 업무공간]
 워크스테이션: ${data.workstations.count}개 (${data.workstations.size}cm)

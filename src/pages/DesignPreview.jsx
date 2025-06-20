@@ -32,8 +32,8 @@ const DesignPreview = () => {
         space_size: formData?.spaceSize ? `${formData.spaceSize}평` : '',
         total_employees: formData?.totalEmployees ? `${formData.totalEmployees}명` : '',
         budget: formData?.budget || '',
-        start_schedule: formData?.startSchedule ? new Date(formData.startSchedule).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long' }) : '미정',
-        end_schedule: formData?.endSchedule ? new Date(formData.endSchedule).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long' }) : '미정',
+        start_schedule: formData?.startSchedule ? formData.startSchedule : '미정',
+        end_schedule: formData?.endSchedule ? formData.endSchedule : '미정',
         work_style: (formData?.workStyle || []).map(getWorkStyleLabel).filter(Boolean).join(', '),
         seating_type: formData?.seatingType === 'fixed' ? '고정좌석제' : '자율좌석제',
         work_style_flexibility: {
@@ -134,8 +134,8 @@ const DesignPreview = () => {
       ['규모 및 예산 범위', '공간 크기', `${data.spaceSize}평`],
       ['', '총 인원', `${data.totalEmployees}명`],
       ['', '예산 범위', data.budget],
-      ['', '시작 일정', data.startSchedule ? new Date(data.startSchedule).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long' }) : '미정'],
-      ['', '완료 일정', data.endSchedule ? new Date(data.endSchedule).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long' }) : '미정'],
+      ['', '시작 일정', data.startSchedule ? data.startSchedule : '미정'],
+      ['', '완료 일정', data.endSchedule ? data.endSchedule : '미정'],
       ['업무 공간 설정', '업무 형태', (data.workStyle || []).map(getWorkStyleLabel).filter(Boolean).join(', ')],
       ['', '좌석제도', data.seatingType === 'fixed' ? '고정좌석제' : '자율좌석제'],
       ['', '업무 공간 유연성', {
@@ -217,8 +217,8 @@ const DesignPreview = () => {
               <p>공간 크기: {formData?.spaceSize}평</p>
               <p>오피스 총 인원: {formData?.totalEmployees}명</p>
               <p>예산 범위: {formData?.budget}</p>
-              <p>시작 일정: {formData?.startSchedule ? new Date(formData.startSchedule).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long' }) : '미정'}</p>
-              <p>완료 일정: {formData?.endSchedule ? new Date(formData.endSchedule).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long' }) : '미정'}</p>
+              <p>시작 일정: {formData?.startSchedule ? formData.startSchedule : '미정'}</p>
+              <p>완료 일정: {formData?.endSchedule ? formData.endSchedule : '미정'}</p>
             </div>
             <div className="info-item">
               <h3>업무 공간 설정</h3>
