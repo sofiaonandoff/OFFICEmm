@@ -207,29 +207,29 @@ const DesignPreview = () => {
           <div className="info-grid">
             <div className="info-item">
               <h3>기본 정보</h3>
-              <p>회사명: {formData?.companyName}</p>
-              <p>담당자: {formData?.contactName}</p>
-              <p>연락처: {formData?.contactPhone}</p>
-              <p>이메일: {formData?.contactEmail}</p>
+              <p className="info-value">회사명: {formData?.companyName}</p>
+              <p className="info-value">담당자: {formData?.contactName}</p>
+              <p className="info-value">연락처: {formData?.contactPhone}</p>
+              <p className="info-value">이메일: {formData?.contactEmail}</p>
             </div>
             <div className="info-item">
               <h3>규모 및 예산 범위</h3>
-              <p>공간 크기: {formData?.spaceSize}평</p>
-              <p>오피스 총 인원: {formData?.totalEmployees}명</p>
-              <p>예산 범위: {formData?.budget}</p>
-              <p>시작 일정: {formData?.startSchedule ? formData.startSchedule : '미정'}</p>
-              <p>완료 일정: {formData?.endSchedule ? formData.endSchedule : '미정'}</p>
+              <p className="info-value">공간 크기: {formData?.spaceSize}평</p>
+              <p className="info-value">오피스 총 인원: {formData?.totalEmployees}명</p>
+              <p className="info-value">예산 범위: {formData?.budget}</p>
+              <p className="info-value">시작 일정: {formData?.startSchedule ? formData.startSchedule : '미정'}</p>
+              <p className="info-value">완료 일정: {formData?.endSchedule ? formData.endSchedule : '미정'}</p>
             </div>
             <div className="info-item">
               <h3>업무 공간 설정</h3>
-              <p>업무 형태: {
+              <p className="info-value">업무 형태: {
                 (formData?.workStyle || [])
                   .map(getWorkStyleLabel)
                   .filter(Boolean)
                   .join(', ')
               }</p>
-              <p>좌석제도: {formData?.seatingType === 'fixed' ? '고정좌석제' : '자율좌석제'}</p>
-              <p>업무 공간 유연성: {
+              <p className="info-value">좌석제도: {formData?.seatingType === 'fixed' ? '고정좌석제' : '자율좌석제'}</p>
+              <p className="info-value">업무 공간 유연성: {
                 {
                   'high': '매우 유연',
                   'medium': '중간',
@@ -239,17 +239,17 @@ const DesignPreview = () => {
             </div>
             <div className="info-item">
               <h3>개인 업무공간</h3>
-              <p>워크스테이션: {formData?.workstations.count}개 ({formData?.workstations.size}cm)</p>
-              <p>개인 락커: {formData?.lockers.count}개</p>
-              <p>1인 포커스룸: {formData?.focusRooms.single.count}개</p>
-              <p>2인 포커스룸: {formData?.focusRooms.double.count}개</p>
-              <p>임원실(사무실): {formData?.executiveRooms.count}개</p>
+              <p className="info-value">워크스테이션: {formData?.workstations.count}개 ({formData?.workstations.size}cm)</p>
+              <p className="info-value">개인 락커: {formData?.lockers.count}개</p>
+              <p className="info-value">1인 포커스룸: {formData?.focusRooms.single.count}개</p>
+              <p className="info-value">2인 포커스룸: {formData?.focusRooms.double.count}개</p>
+              <p className="info-value">임원실(사무실): {formData?.executiveRooms.count}개</p>
             </div>
             <div className="info-item">
               <h3>회의실</h3>
               {Object.entries(formData?.meetingRooms || {}).map(([type, data]) => (
                 data.count > 0 && (
-                  <p key={type}>
+                  <p className="info-value" key={type}>
                     {type === 'small' && '소형 회의실'}
                     {type === 'medium' && '중형 회의실'}
                     {type === 'large' && '대형 회의실'}
@@ -262,7 +262,7 @@ const DesignPreview = () => {
               <h3>추가 공간</h3>
               {Object.entries(formData?.additionalSpaces || {}).map(([type, data]) => (
                 data.required && (
-                  <p key={type}>
+                  <p className="info-value" key={type}>
                     {type === 'canteen' && '캔틴'}
                     {type === 'lounge' && '라운지'}
                     {type === 'breakRoom' && '휴게실'}

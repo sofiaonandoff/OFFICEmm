@@ -920,7 +920,7 @@ const InitialInfo = () => {
             (step === 1 && (!formData.companyName || !formData.contactName ||
               !formData.contactPhone || !formData.contactEmail ||
               emailError || !validateEmail(formData.contactEmail))) ||
-            (step === 2 && (!formData.seatingType || formData.workStyle.length === 0 || !formData.workStyleFlexibility || (formData.workStyle.includes('other') && !workStyleOther)))
+            (step === 2 && (!formData.seatingType || formData.workStyle.length === 0 || !formData.workStyleFlexibility))
           }
         >
           {step === 3 ? '설계 시작하기' : '다음'}
