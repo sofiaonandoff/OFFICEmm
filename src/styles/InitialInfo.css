@@ -574,6 +574,9 @@ select:focus {
 .schedule-input {
   position: relative;
   width: 100%;
+  display: flex;
+  align-items: center;
+  flex-grow: 1;
 }
 
 .schedule-input input[type="month"] {
@@ -621,6 +624,33 @@ select:focus {
 .skip-button:hover {
   background-color: #f5f5f5;
   border-color: #ccc;
+}
+
+.styled-date-input {
+  height: 44px;
+  min-width: 240px;
+  width: 100%;
+  padding: 0 16px;
+  font-size: 1rem;
+  border: 1.5px solid #bfc8d6;
+  border-radius: 8px;
+  background: #fff;
+  color: #222;
+  box-sizing: border-box;
+  margin-right: 8px;
+  transition: border 0.2s;
+}
+
+.styled-date-input:focus {
+  border: 2px solid #007bff;
+  outline: none;
+}
+
+/* 버튼과 자연스럽게 어울리도록 여백 조정 */
+.schedule-input {
+  display: flex;
+  align-items: center;
+  flex-grow: 1;
 }
 
 @media (max-width: 768px) {

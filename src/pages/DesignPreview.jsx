@@ -11,6 +11,18 @@ const DesignPreview = () => {
   const handleSubmitData = async () => {
     try {
       // 이메일 템플릿에 맞는 데이터 구성
+      const getWorkStyleLabel = (id) => ({
+        'startup': '스타트업',
+        'finance': '재무/금융',
+        'tech': 'IT/기술',
+        'creative': '크리에이티브',
+        'consulting': '컨설팅',
+        'research': '연구/개발',
+        'marketing': '마케팅',
+        'general': '일반 사무',
+        'other': formData?.workStyleOther || '기타'
+      }[id] || id);
+
       const emailData = {
         company_name: formData?.companyName || '',
         contact_name: formData?.contactName || '',
@@ -21,16 +33,7 @@ const DesignPreview = () => {
         budget: formData?.budget || '',
         start_schedule: formData?.startSchedule ? new Date(formData.startSchedule).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long' }) : '미정',
         end_schedule: formData?.endSchedule ? new Date(formData.endSchedule).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long' }) : '미정',
-        work_style: {
-          'startup': '스타트업',
-          'finance': '재무/금융',
-          'tech': 'IT/기술',
-          'creative': '크리에이티브',
-          'consulting': '컨설팅',
-          'research': '연구/개발',
-          'marketing': '마케팅',
-          'general': '일반 사무'
-        }[formData?.workStyle] || '',
+        work_style: (formData?.workStyle || []).map(getWorkStyleLabel).filter(Boolean).join(', '),
         seating_type: formData?.seatingType === 'fixed' ? '고정좌석제' : '자율좌석제',
         work_style_flexibility: {
           'high': '매우 유연',
@@ -84,7 +87,7 @@ const DesignPreview = () => {
       startSchedule: '',
       endSchedule: '',
       seatingType: '',
-      workStyle: '',
+      workStyle: [],
       workStyleFlexibility: '',
       workstations: { count: 0, size: '140x70' },
       lockers: { count: 0 },
@@ -132,16 +135,7 @@ const DesignPreview = () => {
       ['', '예산 범위', data.budget],
       ['', '시작 일정', data.startSchedule ? new Date(data.startSchedule).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long' }) : '미정'],
       ['', '완료 일정', data.endSchedule ? new Date(data.endSchedule).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long' }) : '미정'],
-      ['업무 공간 설정', '업무 형태', {
-        'startup': '스타트업',
-        'finance': '재무/금융',
-        'tech': 'IT/기술',
-        'creative': '크리에이티브',
-        'consulting': '컨설팅',
-        'research': '연구/개발',
-        'marketing': '마케팅',
-        'general': '일반 사무'
-      }[data.workStyle]],
+      ['업무 공간 설정', '업무 형태', (data.workStyle || []).map(getWorkStyleLabel).filter(Boolean).join(', ')],
       ['', '좌석제도', data.seatingType === 'fixed' ? '고정좌석제' : '자율좌석제'],
       ['', '업무 공간 유연성', {
         'high': '매우 유연',
@@ -228,16 +222,10 @@ const DesignPreview = () => {
             <div className="info-item">
               <h3>업무 공간 설정</h3>
               <p>업무 형태: {
-                {
-                  'startup': '스타트업',
-                  'finance': '재무/금융',
-                  'tech': 'IT/기술',
-                  'creative': '크리에이티브',
-                  'consulting': '컨설팅',
-                  'research': '연구/개발',
-                  'marketing': '마케팅',
-                  'general': '일반 사무'
-                }[formData?.workStyle]
+                (formData?.workStyle || [])
+                  .map(getWorkStyleLabel)
+                  .filter(Boolean)
+                  .join(', ')
               }</p>
               <p>좌석제도: {formData?.seatingType === 'fixed' ? '고정좌석제' : '자율좌석제'}</p>
               <p>업무 공간 유연성: {

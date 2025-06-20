@@ -7,6 +7,7 @@ const InitialInfo = () => {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [emailError, setEmailError] = useState('');
+  const [workStyleOther, setWorkStyleOther] = useState('');
 
   // 초기 formData 상태
   const initialFormData = {
@@ -20,7 +21,7 @@ const InitialInfo = () => {
     startSchedule: '',
     endSchedule: '',
     seatingType: '',
-    workStyle: '',
+    workStyle: [],
     workStyleFlexibility: '',
     workstations: {
       count: 0,
@@ -182,7 +183,8 @@ const InitialInfo = () => {
     { id: 'consulting', label: '컨설팅', icon: '📊' },
     { id: 'research', label: '연구/개발', icon: '🔬' },
     { id: 'marketing', label: '마케팅', icon: '📈' },
-    { id: 'general', label: '일반 사무', icon: '🏢' }
+    { id: 'general', label: '일반 사무', icon: '🏢' },
+    { id: 'other', label: '기타', icon: '➕' }
   ];
 
   const flexibilityLevels = [
@@ -366,6 +368,21 @@ const InitialInfo = () => {
     }));
   };
 
+  const handleWorkStyleChange = (id) => {
+    setFormData(prev => {
+      const exists = prev.workStyle.includes(id);
+      let newWorkStyle = exists
+        ? prev.workStyle.filter(styleId => styleId !== id)
+        : [...prev.workStyle, id];
+      // 기타 해제 시 입력값도 초기화
+      if (id === 'other' && exists) setWorkStyleOther('');
+      return {
+        ...prev,
+        workStyle: newWorkStyle
+      };
+    });
+  };
+
   const handleNext = () => {
     if (step < 3) {
       setStep(step + 1);
@@ -492,12 +509,13 @@ const InitialInfo = () => {
                   <label>시작 일정</label>
                   <div className="schedule-input">
                     <input
-                      type="month"
+                      type="date"
                       name="startSchedule"
                       value={formData.startSchedule}
                       onChange={handleInputChange}
-                      min={new Date().toISOString().slice(0, 7)}
-                      placeholder="시작 일정을 선택하세요"
+                      min={new Date().toISOString().slice(0, 10)}
+                      placeholder="시작 일자 선택"
+                      className="styled-date-input"
                     />
                   </div>
                 </div>
@@ -505,12 +523,13 @@ const InitialInfo = () => {
                   <label>공사 완료 일정</label>
                   <div className="schedule-input">
                     <input
-                      type="month"
+                      type="date"
                       name="endSchedule"
                       value={formData.endSchedule}
                       onChange={handleInputChange}
-                      min={formData.startSchedule || new Date().toISOString().slice(0, 7)}
-                      placeholder="완료 일정을 선택하세요"
+                      min={formData.startSchedule ? formData.startSchedule : new Date().toISOString().slice(0, 10)}
+                      placeholder="완료 일자 선택"
+                      className="styled-date-input"
                     />
                   </div>
                 </div>
@@ -526,16 +545,34 @@ const InitialInfo = () => {
               <div className="setting-section">
                 <h3>업무 형태 선택</h3>
                 <div className="work-style-options">
-                  {workStyles.map((style) => (
-                    <button
-                      key={style.id}
-                      className={`work-style-option ${formData.workStyle === style.id ? 'selected' : ''}`}
-                      onClick={() => handleInputChange({ target: { name: 'workStyle', value: style.id } })}
-                    >
-                      <span className="icon">{style.icon}</span>
-                      {style.label}
-                    </button>
-                  ))}
+                  {workStyles.map((style) => {
+                    const checked = formData.workStyle.includes(style.id);
+                    return (
+                      <label
+                        key={style.id}
+                        className={`work-style-checkbox work-style-btn${checked ? ' selected' : ''}`}
+                        style={{ display: 'inline-block', margin: '0 8px 8px 0', cursor: 'pointer', border: checked ? '2px solid #007bff' : '1px solid #ccc', borderRadius: '8px', padding: '10px 16px', background: checked ? '#e6f0ff' : '#fff', transition: 'all 0.2s' }}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          onChange={() => handleWorkStyleChange(style.id)}
+                          style={{ display: 'none' }}
+                        />
+                        <span className="icon" style={{ marginRight: 6 }}>{style.icon}</span>
+                        {style.label}
+                        {style.id === 'other' && checked && (
+                          <input
+                            type="text"
+                            value={workStyleOther}
+                            onChange={e => setWorkStyleOther(e.target.value)}
+                            placeholder="기타 업무 형태 입력"
+                            style={{ marginLeft: 8, padding: '2px 6px', borderRadius: 4, border: '1px solid #ccc', width: 120 }}
+                          />
+                        )}
+                      </label>
+                    );
+                  })}
                 </div>
               </div>
 
@@ -874,7 +911,7 @@ const InitialInfo = () => {
             (step === 1 && (!formData.companyName || !formData.contactName ||
               !formData.contactPhone || !formData.contactEmail ||
               emailError || !validateEmail(formData.contactEmail))) ||
-            (step === 2 && (!formData.seatingType || !formData.workStyle || !formData.workStyleFlexibility))
+            (step === 2 && (!formData.seatingType || formData.workStyle.length === 0 || !formData.workStyleFlexibility || (formData.workStyle.includes('other') && !workStyleOther)))
           }
         >
           {step === 3 ? '설계 시작하기' : '다음'}

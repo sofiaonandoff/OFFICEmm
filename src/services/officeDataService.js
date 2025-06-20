@@ -99,6 +99,18 @@ export const exportOfficeData = () => {
         .map(([type, space]) => `${type}(${space.size || '크기 미지정'})`)
         .join('; ');
 
+      const getWorkStyleLabel = (id, item) => ({
+        'startup': '스타트업',
+        'finance': '재무/금융',
+        'tech': 'IT/기술',
+        'creative': '크리에이티브',
+        'consulting': '컨설팅',
+        'research': '연구/개발',
+        'marketing': '마케팅',
+        'general': '일반 사무',
+        'other': item.workStyleOther || '기타'
+      }[id] || id);
+
       return [
         item.id,
         item.timestamp,
@@ -106,7 +118,9 @@ export const exportOfficeData = () => {
         item.totalEmployees,
         item.budget,
         item.seatingType === 'fixed' ? '고정좌석제' : '자율좌석제',
-        item.workStyle,
+        Array.isArray(item.workStyle)
+          ? item.workStyle.map(id => getWorkStyleLabel(id, item)).filter(Boolean).join(', ')
+          : item.workStyle,
         item.workStyleFlexibility,
         item.workstations.count,
         item.workstations.size,
