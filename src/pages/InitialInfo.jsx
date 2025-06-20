@@ -388,7 +388,11 @@ const InitialInfo = () => {
       setStep(step + 1);
     } else {
       // 다음 단계로 이동
-      navigate('/design-preview', { state: { formData } });
+      const mergedFormData = {
+        ...formData,
+        workStyleOther
+      };
+      navigate('/design-preview', { state: { formData: mergedFormData } });
     }
   };
 
@@ -397,7 +401,12 @@ const InitialInfo = () => {
       if (step === 2) {
         setStep(3);
       } else {
-        navigate('/design-preview', { state: { formData } });
+        // 다음 단계로 이동
+        const mergedFormData = {
+          ...formData,
+          workStyleOther
+        };
+        navigate('/design-preview', { state: { formData: mergedFormData } });
       }
     }
   };

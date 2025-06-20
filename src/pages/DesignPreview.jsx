@@ -8,21 +8,22 @@ const DesignPreview = () => {
   const navigate = useNavigate();
   const formData = location.state?.formData;
 
+  // 업무형태 라벨 변환 함수(컴포넌트 상단에 선언)
+  const getWorkStyleLabel = (id) => ({
+    'startup': '스타트업',
+    'finance': '재무/금융',
+    'tech': 'IT/기술',
+    'creative': '크리에이티브',
+    'consulting': '컨설팅',
+    'research': '연구/개발',
+    'marketing': '마케팅',
+    'general': '일반 사무',
+    'other': formData?.workStyleOther || '기타'
+  }[id] || id);
+
   const handleSubmitData = async () => {
     try {
       // 이메일 템플릿에 맞는 데이터 구성
-      const getWorkStyleLabel = (id) => ({
-        'startup': '스타트업',
-        'finance': '재무/금융',
-        'tech': 'IT/기술',
-        'creative': '크리에이티브',
-        'consulting': '컨설팅',
-        'research': '연구/개발',
-        'marketing': '마케팅',
-        'general': '일반 사무',
-        'other': formData?.workStyleOther || '기타'
-      }[id] || id);
-
       const emailData = {
         company_name: formData?.companyName || '',
         contact_name: formData?.contactName || '',
